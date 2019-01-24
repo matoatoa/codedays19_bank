@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,16 +20,16 @@ public class Controller {
     private final static Consumer<MarketData> LOG_RESULT = datum -> LOGGER.info("Got result:{}", datum);
 
     private final static List<String> COMPANIES = List.of("Google", "Amazon", "BMV", "Microsoft", "Apple", "SAP", "Audi", "Daimler", "Telekom", "Bosch", "Siemens", "IBM", "Porsche", "VW", "DB");
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
 
-    public Controller(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public Controller(WebClient webClient) {
+        this.webClient = webClient;
     }
 
     @GetMapping("/marketData")
-    public List<MarketData> getMarketData() {
-        final Function<String, MarketData> CALL_SERVER =
-                id -> restTemplate.getForObject("/api/market/" + id, MarketData.class, Collections.emptyMap());
-        return COMPANIES.stream().parallel().map(CALL_SERVER).peek(LOG_RESULT).collect(Collectors.toList());
+    public Mono<List<Mono<MarketData>>> getMarketData() {
+        final Function<String, Mono<MarketData>> CALL_SERVER =
+                id -> webClient.get().uri("/api/market/{id}", id).retrieve().bodyToMono(MarketData.class);
+        return Flux.fromIterable(COMPANIES).map(CALL_SERVER).collectList();
     }
 }

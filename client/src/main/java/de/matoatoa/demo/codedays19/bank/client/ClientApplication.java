@@ -2,16 +2,16 @@ package de.matoatoa.demo.codedays19.bank.client;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @SpringBootApplication
 public class ClientApplication {
 
+
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder.rootUri("http://localhost:9500").build();
+    public WebClient webClient() {
+        return WebClient.create("http://localhost:9500");
     }
 
     public static void main(String[] args) {
