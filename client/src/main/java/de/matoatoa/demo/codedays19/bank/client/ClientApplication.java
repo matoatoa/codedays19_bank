@@ -9,6 +9,11 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 public class ClientApplication {
 
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.rootUri("http://localhost:9500").build();
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(ClientApplication.class, args);
     }
