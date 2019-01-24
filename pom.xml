@@ -12,6 +12,7 @@
     <modules>
         <module>server</module>
         <module>reactive</module>
+        <module>client</module>
     </modules>
 
 </project>
