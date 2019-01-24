@@ -8,11 +8,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @RestController
 public class Controller {
@@ -27,9 +25,9 @@ public class Controller {
     }
 
     @GetMapping("/marketData")
-    public Mono<List<Mono<MarketData>>> getMarketData() {
+    public Mono<List<MarketData>> getMarketData() {
         final Function<String, Mono<MarketData>> CALL_SERVER =
                 id -> webClient.get().uri("/api/market/{id}", id).retrieve().bodyToMono(MarketData.class);
-        return Flux.fromIterable(COMPANIES).map(CALL_SERVER).collectList();
+        return Flux.fromIterable(COMPANIES).flatMap(CALL_SERVER).collectList();
     }
 }
